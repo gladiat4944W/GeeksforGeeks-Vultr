@@ -1,0 +1,31 @@
+import org.tensorflow.Graph;
+import org.tensorflow.Session;
+import org.tensorflow.Tensor;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class StressDetection {
+    public static void main(String[] args) {
+        // Load the model
+        try (Graph graph = new Graph()) {
+            byte[] graphDef = Files.readAllBytes(Paths.get("stress_detection_model.h5"));
+            graph.importGraphDef(graphDef);
+
+            try (Session session = new Session(graph)) {
+                // Prepare input tensor (example: replace with actual image data)
+                float[][][][] inputData = new float[1][48][48][1]; // Adjust based on your input shape
+                // Fill inputData with actual image data here
+
+                Tensor inputTensor = Tensor.create(inputData);
+
+                // Run the model
+                Tensor outputTensor = session.runner()
+                        .fetch("dense_2/Softmax") // Adjust according to your model's output layer name
+                        .feed("conv2d_input", inputTensor) // Adjust according to your model's input layer name
+                        .run()
+                        .get(0);
+
+                // Process output tensor
+                float[][] output = new float[1][7
